@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AquaAide - Points d'eau et maraudes</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+      background-color: #f3f4f6;
+      color: #1f2937;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Layout components */
+    .header {
+      background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+      color: white;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-title {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    .main-nav {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    
+    .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .main-content {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 20px;
+    }
+    
+    /* Cards and containers */
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #f3f4f6;
+      padding-bottom: 10px;
+    }
+    
+    .card-header h2 {
+      font-size: 22px;
+      font-weight: bold;
+    }
+    
+    .card-header span {
+      font-size: 14px;
+      color: #2563eb;
+    }
+    
+    /* Content layout */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Service cards */
+    .service-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .service-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .service-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .service-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 20px;
+    }
+    
+    .point-eau .service-icon {
+      background-color: #dbeafe;
+      color: #2563eb;
+    }
+    
+    .maraude .service-icon {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+    
+    .service-info {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .service-info-text h3 {
+      font-weight: 500;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    
+    .service-info-text p {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .service-distance {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-left: 20px;
+    }
+    
+    .service-distance span:first-child {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .service-distance span:last-child {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+    }
+
+    
+    
+    .btn-outline {
+      background-color: transparent;
+      color: #2563eb;
+      border: 1px solid #2563eb;
+    }
+    
+    .btn-gray {
+      background-color: #e5e7eb;
+      color: #4b5563;
+      border: none;
+    }
+    
+    .mt-3 {
+      margin-top: 12px;
+    }
+    
+    .mt-4 {
+      margin-top: 16px;
+    }
+    
+    /* Map view */
+    .map-container {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .leaflet-map {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+    }
+    
+    .map-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+    
+    .map-control-btn {
+      background-color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 14px;
+    }
+    
+    .map-control-btn.active {
+      background-color: #2563eb;
+      color: white;
+    }
+    
+    .map-legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    
+    .map-legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .map-legend-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .legend-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .legend-icon.point_eau {
+      background-color: #3b82f6;
+      color: white;
+    }
+    
+    .legend-icon.maraude {
+      background-color: #f59e0b;
+      color: white;
+    }
+    
+    /* Service details */
+    .details-header {
+      padding: 24px;
+      color: white;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 20px;
+    }
+    
+    .details-header.point_eau {
+      background-color: #2563eb;
+    }
+    
+    .details-header.maraude {
+      background-color: #d97706;
+    }
+    
+    .back-button {
+      margin-bottom: 12px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .back-button::before {
+      content: "←";
+      margin-right: 8px;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    
+    .info-label {
+      color: #6b7280;
+      font-size: 16px;
+    }
+    
+    .info-value {
+      font-weight: 500;
+      font-size: 16px;
+    }
+    
+    .map-route {
+      height: 200px;
+      background-color: #e5e7eb;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+      font-size: 16px;
+    }
+    
+    .action-buttons {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .action-buttons button {
+      flex: 1;
+    }
+    
+    /* Tab content visibility */
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+      
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .main-nav {
+        margin-top: 16px;
+        width: 100%;
+        overflow-x: auto;
+      }
+    }
+
+    /* Leaflet custom styles */
+    .custom-marker-icon {
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .marker-point-eau {
+      background-color: #3b82f6;
+      color: white;
+    }
+    
+    .marker-maraude {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .footer {
+      background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+      color: white;
+      text-align: center;
+      padding: 15px 20px;
+      font-size: 14px;
+      box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+
+  </style>
+</head>
+<body>
+ 
+  <header class="header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>AquaAide</h1>
+        <p>Points d'eau et maraudes près de vous</p>
+      </div>
+      <nav class="main-nav">
+        <a class="nav-link active" onclick="switchTab('home')">Accueil</a>
+        <a class="nav-link" onclick="switchTab('map')">Carte</a>
+        <a class="nav-link" onclick="switchTab('list')">Liste</a>
+        <a class="nav-link" onclick="switchTab('info')">Infos</a>
+      </nav>
+    </div>
+  </header>
+  
+  <main class="main-content">
+
+    <div id="home-tab" class="tab-content active">
+      <div class="grid-layout">
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h2>Points d'eau et maraudes à proximité</h2>
+              <span>Dernière mise à jour: 20h42</span>
+            </div>
+            
+            <div id="nearest-services" class="service-list">
+             
+            </div>
+            
+            <button class="btn btn-outline mt-3" onclick="switchTab('list')">
+              Voir plus
+            </button>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-header">Signaler un point</h2>
+          <p style="font-size: 16px; color: #6b7280; margin-bottom: 20px;">
+            Vous connaissez un point d'eau ou une maraude qui n'est pas répertorié?
+          </p>
+
+          <button id="btn-add-report" style="margin-right: 10px; padding: 10px 20px; background-color: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Ajouter un point d'eau
+          </button>
+
+          <button id="btn-add-maraude" style="padding: 10px 20px; background-color: #16a34a; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Ajouter une maraude
+          </button>
+
+          <div id="form-report" style="display:none; border: 1px solid #ddd; padding: 20px; margin-top: 15px; max-width: 450px; background: #f9fafb; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3 style="margin-bottom: 15px; color: #2563eb;">Signaler un point d'eau</h3>
+            <form id="signal-form" style="display: flex; flex-direction: column; gap: 12px;">
+              <label style="font-weight: 600; color: #374151;">
+                Nom du point d'eau :
+                <input type="text" name="name" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+              </label>
+
+              <label style="font-weight: 600; color: #374151;">
+                Adresse ou coordonnées :
+                <input type="text" name="address" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+              </label>
+
+              <label style="font-weight: 600; color: #374151;">
+                Type :
+                <select name="type" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                  <option value="fontaine">Fontaine</option>
+                  <option value="robinet">Robinet</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </label>
+
+              <label style="font-weight: 600; color: #374151;">
+                Commentaire :
+                <textarea name="comments" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+              </label>
+
+              <button type="submit" style="align-self: flex-start; padding: 10px 20px; background-color: #2563eb; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Envoyer
+              </button>
+            </form>
+          </div>
+
+          <div id="form-maraude" style="display:none; border: 1px solid #ddd; padding: 20px; margin-top: 15px; max-width: 450px; background: #f9fafb; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3 style="margin-bottom: 15px; color: #16a34a;">Ajouter une maraude</h3>
+            <form id="maraude-form" style="display: flex; flex-direction: column; gap: 12px;">
+              <label style="font-weight: 600; color: #374151;">
+                Nom de la maraude :
+                <input type="text" name="name" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+              </label>
+
+              <label style="font-weight: 600; color: #374151;">
+                Adresse ou coordonnées :
+                <input type="text" name="address" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+              </label>
+
+              <label style="font-weight: 600; color: #374151;">
+                Description :
+                <textarea name="description" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+              </label>
+
+              <button type="submit" style="align-self: flex-start; padding: 10px 20px; background-color: #16a34a; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Envoyer
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+ 
+    <div id="map-tab" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>Carte des points d'eau et maraudes</h2>
+          <span id="map-services-count">35 services disponibles</span>
+        </div>
+        
+        <div class="map-container">
+          <div id="leaflet-map" class="leaflet-map"></div>
+          
+          <div class="map-controls">
+            <button class="map-control-btn active" onclick="filterMap('all')" id="filter-all">Tout</button>
+            <button class="map-control-btn" onclick="filterMap('point_eau')" id="filter-water">💧 Eau</button>
+            <button class="map-control-btn" onclick="filterMap('maraude')" id="filter-food">🍲 Maraudes</button>
+          </div>
+          
+          <div class="map-legend">
+            <div class="map-legend-item">
+              <div class="legend-icon point_eau">💧</div>
+              <span>Points d'eau (<span id="water-count">0</span>)</span>
+            </div>
+            <div class="map-legend-item">
+              <div class="legend-icon maraude">🍲</div>
+              <span>Maraudes (<span id="food-count">0</span>)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- List tab -->
+    <div id="list-tab" class="tab-content">
+      <div class="two-column">
+        <div class="card">
+          <div class="card-header">
+            <h2>Points d'eau</h2>
+            <span id="water-list-count">0 points</span>
+          </div>
+          
+          <div id="water-services-list" class="service-list">
+            <!-- Points d'eau will be populated dynamically -->
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h2>Maraudes</h2>
+            <span id="food-list-count">0 maraudes</span>
+          </div>
+          
+          <div id="food-services-list" class="service-list">
+            <!-- Maraudes will be populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Service details -->
+    <div id="service-details" class="tab-content">
+      <!-- This will be populated dynamically -->
+    </div>
+    
+    <!-- Info tab -->
+    <div id="info-tab" class="tab-content">
+      <div class="two-column">
+        <div class="card">
+          <h2 class="card-header">À propos de AquaAide</h2>
+          <p style="font-size: 16px; color: #6b7280; margin-bottom: 20px; line-height: 1.6;">
+            AquaAide est une application collaborative qui recense les points d'eau potable et les maraudes accessibles aux personnes en situation de précarité.
+            <br><br>
+            Toutes les données sont vérifiées régulièrement par notre communauté de bénévoles et nos partenaires associatifs.
+          </p>
+          <div style="background-color: #f0f9ff; padding: 15px; border-radius: 6px; border-left: 4px solid #2563eb;">
+            <strong>Statistiques actuelles :</strong>
+            <div style="margin-top: 10px;">
+              <div>📍 <span id="stats-total">35</span> services répertoriés</div>
+              <div>💧 <span id="stats-water">0</span> points d'eau</div>
+              <div>🍲 <span id="stats-food">0</span> maraudes</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-header">Contact</h2>
+          <p style="font-size: 16px; color: #6b7280; margin-bottom: 20px;">
+            Pour toute question ou suggestion, n'hésitez pas à nous contacter à l'adresse suivante : aquaAide@gmail.com
+          </p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-header">Pourquoi cette carte ?</h2>
+          <p style="font-size: 16px; color: #6b7280; line-height: 1.6;">
+            En ville, il est parfois difficile de trouver un point d'eau potable ou un lieu de distribution alimentaire. 
+            Cette application propose une carte interactive qui localise les fontaines publiques et les endroits où des 
+            associations distribuent de la nourriture gratuitement.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-header">À qui s'adresse ce projet ?</h2>
+          <p style="font-size: 16px; color: #6b7280; line-height: 1.6;">
+            Le service est destiné à toute personne ayant besoin d'un accès facilité à l'eau et à la nourriture : étudiants, 
+            personnes en situation de précarité, personnes âgées ou simplement passants en recherche rapide d'un point d'eau.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-header">Fonctionnalités principales</h2>
+          <ul style="font-size: 16px; color: #6b7280; line-height: 1.6; padding-left: 20px; margin-top: 0;">
+            <li>Carte interactive avec localisation des points d'eau et de nourriture</li>
+            <li>Filtrage par type de ressource</li>
+            <li>Informations utiles : horaires, accessibilité</li>
+            <li>Calcul des distances depuis votre position</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2 class="card-header">Un projet local, à vocation solidaire</h2>
+          <p style="font-size: 16px; color: #6b7280; line-height: 1.6;">
+            Ce projet est né d'une volonté de répondre à un besoin croissant dans un contexte de changement climatique 
+            et d'augmentation des inégalités. Il s'appuie sur des données publiques, avec une mise à jour régulière pour 
+            garantir des informations fiables et utiles.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+<script src="aquaaide-data.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<footer class="footer">
+  <div class="footer-content">
+    <p>&copy; 2025 AquaAide - Tous droits réservés</p>
+  </div>
+</footer>
+
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carte Accès Eau & Nourriture - Paris</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #2e86ab;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: #2e86ab;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Carte Interactive - Eau & Nourriture à Paris</h1>
+    <p>Un outil simple pour mieux s’orienter en ville</p>
+  </header>
+
+  <div class="container">
+    <section>
+      <h2>Pourquoi cette carte ?</h2>
+      <p>
+        En ville, il est parfois difficile de trouver un point d’eau potable ou un lieu de distribution alimentaire. 
+        Cette application propose une carte interactive qui localise les fontaines publiques et les endroits où des 
+        associations distribuent de la nourriture gratuitement.
+      </p>
+    </section>
+
+    <section>
+      <h2>À qui s’adresse ce projet ?</h2>
+      <p>
+        Le service est destiné à toute personne ayant besoin d’un accès facilité à l’eau et à la nourriture :
+        étudiants, personnes en situation de précarité, personnes âgées ou simplement passants en recherche rapide 
+        d’un point d’eau.
+      </p>
+    </section>
+
+    <section>
+      <h2>Fonctionnalités principales</h2>
+      <ul>
+        <li>Carte interactive avec localisation des points d’eau et de nourriture</li>
+        <li>Filtrage par type de ressource</li>
+        <li>Informations utiles : horaires, accessibilité</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Un projet local, à vocation solidaire</h2>
+      <p>
+        Ce projet est né d’une volonté de répondre à un besoin croissant dans un contexte de changement climatique 
+        et d’augmentation des inégalités. Il s’appuie sur des données publiques, avec une mise à jour régulière pour 
+        garantir des informations fiables et utiles.
+      </p>
+    </section>
+
+  </div>
+
+  <footer>
+    © 2025 - Carte Eau & Nourriture | Projet associatif à but non lucratif
+  </footer>
+
+</body>
+</html>
+
